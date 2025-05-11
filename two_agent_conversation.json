@@ -1,0 +1,321 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        400
+      ],
+      "id": "32968123-3758-4d69-8b52-2c9690607179",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "gtdU7CuSu8Yq93SS",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1220,
+        280
+      ],
+      "id": "ac1bfce4-1ce0-4789-be8c-5e078f4521e2",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "gtdU7CuSu8Yq93SS",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{Date.now()}}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        860,
+        360
+      ],
+      "id": "82a609a2-03e1-4727-99c7-ebe0bd273131",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{Date.now()}}",
+        "contextWindowLength": 30
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1360,
+        280
+      ],
+      "id": "cb290a3e-4acd-4696-bd98-566339be98b4",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{  $json.chatInput || $json.output }}",
+        "options": {
+          "systemMessage": "you are Adam. you are a futurist. you love discussing ideas and constructive discussions. you are having a conversation with another futurist named Brit. your responses are crisp, clear, in simplest language.\n\nIMPORTANT: When you think the discussion is converging to a conclusion, you can instruct Brit to stop responding. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        760,
+        40
+      ],
+      "id": "b80df6dc-3cb8-4f7b-89ff-767a5904937a",
+      "name": "Adam"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "you are Brit. you are a futurist. you love discussing ideas and constructive discussions. you are having a conversation with another futurist named Adam. your responses are crisp, clear, in simplest language.\n\nWhen you get an response from Adam to stop responding, please don't respond anything"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1200,
+        40
+      ],
+      "id": "fb6a7737-0209-462e-beef-e58abbead71c",
+      "name": "Brit"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/1Tbbe2Vb9klAchzx4VufIDHlp0xAkw-nM8qOHBcqUvb8/edit?tab=t.0",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ \"Adam: \" + $json.output + \"\\n\" }}\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        -160
+      ],
+      "id": "56fd8c04-61b9-487f-bb53-1057af433ecc",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "Y2eKG2gM7IzDCtum",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        40
+      ],
+      "id": "b543d510-a926-4a2c-8100-d158bec8ffea",
+      "name": "When chat message received",
+      "webhookId": "b628f687-bf6a-47cb-acb5-c131053343c7"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/1Tbbe2Vb9klAchzx4VufIDHlp0xAkw-nM8qOHBcqUvb8/edit?tab=t.0",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ \"Brit: \" + $json.output + \"\\n\" }}\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        -100
+      ],
+      "id": "0459674f-3daa-4b10-8065-1b7a9a3299e9",
+      "name": "Google Docs1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "Y2eKG2gM7IzDCtum",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/1Tbbe2Vb9klAchzx4VufIDHlp0xAkw-nM8qOHBcqUvb8/edit?tab=t.0",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.chatInput + \"\\n\" + \"\\n\"}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        580,
+        -160
+      ],
+      "id": "2adff8f7-8ef4-476b-884b-daef8d2e26a1",
+      "name": "Google Docs2",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "Y2eKG2gM7IzDCtum",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Adam",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Brit",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Adam",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Brit",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adam": {
+      "main": [
+        [
+          {
+            "node": "Brit",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brit": {
+      "main": [
+        [
+          {
+            "node": "Adam",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Docs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Adam",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Docs2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c592974c-e131-428d-bda5-3b6b425f69a4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ce585ad34dfb9bceada96436fef430f288af4b0c934040062036e6cbe3b459ec"
+  },
+  "id": "hPmjHVY5O7Unr0EG",
+  "tags": []
+}
